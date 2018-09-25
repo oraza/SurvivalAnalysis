@@ -195,3 +195,58 @@ plot(fit.ggamma.flex, main = "Rectime fit to generalized gamma",
 plot(fit.lognorm.log, main = " (Log) rectime fit to lognormal",
      xlab = "days", ylab = "p")
 
+# CI and diffplots
+# diffplot will show a differential survival within two groups
+# to evaluate the observed difference by comparing the confidence
+# interval around the observed survival curves
+# we will use 'npsurv' funtion from rms library 
+fit <- npsurv(recsurv~gbcs$hormone)
+survplot(fit)
+
+# quantitative way to assess this is by:
+survdiffplot(fit)
+
+# numerical test of whether variable influences survival
+# rho = 0 logrank (Mantel-Haenzel) test
+# rho = 1 Peto & peto modification of the Gehan-Wilcoxon test
+
+survdiff(recsurv~ gbcs$hormone, rho = 0) 
+survdiff(recsurv~ gbcs$menopause, rho = 0)
+gbcs$agecat <- as.numeric(gbcs$age>median(gbcs$age))
+survdiff(recsurv~ gbcs$agecat, rho = 0)
+gbcs$prog_recp.cat <- as.numeric(gbcs$prog_recp>median(gbcs$prog_recp))
+survdiff(recsurv~ gbcs$prog_recp.cat, rho = 0)
+gbcs$estrg_recp.cat <- as.numeric(gbcs$estrg_recp>median(gbcs$estrg_recp))
+survdiff(recsurv~ gbcs$estrg_recp.cat, rho = 0)
+# Repeating with Peto & Peto modification
+survdiff(recsurv~ gbcs$hormone, rho = 1) #
+survdiff(recsurv~ gbcs$menopause, rho = 1)
+survdiff(recsurv~ gbcs$agecat, rho = 1)
+survdiff(recsurv~ gbcs$prog_recp.cat, rho = 1)
+survdiff(recsurv~ gbcs$estrg_recp.cat, rho = 1)
+
+# Cox proportional hazard model with coxph and testing fit
+fit.cox1 <- coxph(recsurv~gbcs$age)
+fit.cox1
+cox.zph(fit.cox1)
+plot(cox.zph(fit.cox1))
+
+fit.cox2 <- coxph(recsurv~gbcs$menopause)
+fit.cox2
+cox.zph(fit.cox2)
+plot(cox.zph(fit.cox2))
+
+fit.cox3 <- coxph(recsurv~gbcs$hormone)
+fit.cox3
+cox.zph(fit.cox3)
+plot(cox.zph(fit.cox3))
+
+fit.cox4 <- coxph(recsurv~gbcs$prog_recp)
+fit.cox4
+cox.zph(fit.cox4)
+plot(cox.zph(fit.cox4))
+
+fit.cox5 <- coxph(recsurv~gbcs$estrg_recp)
+fit.cox5
+cox.zph(fit.cox5)
+plot(cox.zph(fit.cox5))
