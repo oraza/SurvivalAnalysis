@@ -7,7 +7,8 @@ library(rms)
 
 
 gbcs <- read.csv("gbcs.csv", header = T)
-
+# or get it from online 
+# gbcs <- read.csv("https://ryanwomack.com/data/gbcs.csv")
 names(gbcs)
 ## The data is from German Breast Cancer Study
 ## Research question is what influences the reoccurce of the breast cancer?
