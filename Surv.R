@@ -81,4 +81,117 @@ fit <- survfit(recsurv~as.numeric(gbcs$estrg_recp>median(gbcs$estrg_recp)))
 plot(fit, col=c(2,6), lty = c(1,1))
 legend("topright", leg.txt,col=c(2,6), lty=c(1,1))
 
-#
+##### survreg to check the distribution
+## here we will identify the best fit
+## with survreg function we will run regression with various families
+## (distributions) on a survival object
+fit.exp <- survreg(recsurv~1, dist = "exponential")
+fit.wbull <- survreg(recsurv~1, dist = "weibull")
+fit.gaus <- survreg(recsurv~1, dist = "gaussian")
+fit.logis <- survreg(recsurv~1, dist = "logistic")
+fit.lognrom <- survreg(recsurv~1, dist = "lognormal")
+fit.loglogis <- survreg(recsurv~1, dist = "loglogistic")
+summary(fit.exp)
+summary(fit.wbull)
+summary(fit.gaus)
+summary(fit.logis)
+summary(fit.lognrom)
+summary(fit.loglogis)
+
+## the same can be done with flexsurvreg function 
+fit.exp.flex <- flexsurvreg(recsurv~1, dist = "exp")
+fit.wbull.flex <- flexsurvreg(recsurv~1, dist = "weibull")
+fit.gamma.flex <- flexsurvreg(recsurv~1, dist = "gamma")
+fit.ggamma.flex <- flexsurvreg(recsurv~1, dist = "gengamma")
+fit.genf.flex <- flexsurvreg(recsurv~1, dist = "genf")
+fit.lognorm.flex <- flexsurvreg(recsurv~1, dist = "lnorm")
+fit.gompertz.flex <- flexsurvreg(recsurv~1, dist = "gompertz")
+fit.exp.flex 
+fit.wbull.flex
+fit.gamma.flex 
+fit.ggamma.flex 
+fit.genf.flex 
+fit.lognorm.flex 
+fit.gompertz.flex
+
+# Plotting the fit
+plot(fit.exp.flex)
+plot(fit.wbull.flex)
+plot(fit.gamma.flex)
+plot(fit.ggamma.flex) 
+plot(fit.genf.flex) 
+plot(fit.lognorm.flex) 
+plot(fit.gompertz.flex)
+
+# extracting log likelood test values
+fit.exp.flex$loglik
+fit.wbull.flex$loglik
+fit.gamma.flex$loglik
+fit.ggamma.flex$loglik
+fit.genf.flex$loglik
+fit.lognorm.flex$loglik
+fit.gompertz.flex$loglik
+
+# significance test
+sign_lognorm <- 2*(fit.ggamma.flex$loglik - fit.lognorm.flex$loglik)
+sign_lognorm ## not significantly different from each other
+
+## reporting AIC
+fit.exp.flex$AIC
+fit.wbull.flex$AIC
+fit.gamma.flex$AIC
+fit.ggamma.flex$AIC
+fit.genf.flex$AIC
+fit.lognorm.flex$AIC
+fit.gompertz.flex$AIC
+
+## re-running analysis with log transform 
+logprog <- log(gbcs$prog_recp +0.1)
+logest <- log(gbcs$estrg_recp +0.1)
+logrectime <- log(gbcs$rectime)
+logrecsurv <- Surv(logrectime, gbcs$censrec)
+
+# finding a best fit with logrecsurv
+fit.exp.log <- flexsurvreg(logrecsurv~1, dist = "exp")
+fit.wbull.log <- flexsurvreg(logrecsurv~1, dist = "weibull")
+fit.gamma.log <- flexsurvreg(logrecsurv~1, dist = "gamma")
+fit.ggamma.log <- flexsurvreg(logrecsurv~1, dist = "gengamma")
+fit.genf.log <- flexsurvreg(logrecsurv~1, dist = "genf")
+fit.lognorm.log <- flexsurvreg(logrecsurv~1, dist = "lognormal")
+fit.exp.log
+fit.wbull.log
+fit.gamma.log
+fit.ggamma.log
+fit.genf.log 
+fit.lognorm.log 
+# plotting
+plot(fit.exp.log)
+plot(fit.wbull.log)
+plot(fit.gamma.log)
+plot(fit.ggamma.log)
+plot(fit.genf.log) 
+plot(fit.lognorm.log) 
+
+# loglikelihood test
+fit.exp.log$loglik
+fit.wbull.log$loglik
+fit.gamma.log$loglik
+fit.ggamma.log$loglik
+fit.genf.log$loglik
+fit.lognorm.log$loglik 
+
+# AIC based
+fit.exp.log$AIC
+fit.wbull.log$AIC
+fit.gamma.log$AIC
+fit.ggamma.log$AIC
+fit.genf.log$AIC
+fit.lognorm.log$AIC 
+
+# creating graphs
+par(mfrow = c(1,2))
+plot(fit.ggamma.flex, main = "Rectime fit to generalized gamma",
+     xlab= "days", ylab = "p")
+plot(fit.lognorm.log, main = " (Log) rectime fit to lognormal",
+     xlab = "days", ylab = "p")
+
